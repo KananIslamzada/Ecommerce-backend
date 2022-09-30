@@ -17,17 +17,17 @@ app.get("/", (_, res) => {
   res.send("This is home");
 });
 
-mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true });
+// mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true });
 
-const db = mongoose.connection;
+// const db = mongoose.connection;
 
-db.on("open", () => {
-  console.log("Connected to ", process.env.DB_CONNECTION);
-});
+// db.on("open", () => {
+//   console.log("Connected to ", process.env.DB_CONNECTION);
+// });
 
-db.on("error", (err) => {
-  console.log({ err });
-});
+// db.on("error", (err) => {
+//   console.log({ err });
+// });
 
 app.listen(process.env.PORT || 3000, () =>
   console.log(`Listening port ${process.env.PORT || 3000}...`)
