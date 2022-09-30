@@ -1,0 +1,3 @@
+GET         http://localhost:3000/news/6
+content-type: application/json
+
