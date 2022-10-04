@@ -14,8 +14,19 @@ const getAllNews = async (req, res) => {
   try {
     const limit = 10;
     const skip = parseInt(page) * limit;
-    const news = await News.find().skip(skip).limit(limit);
-    const count = await News.count();
+    const {
+      [0]: {
+        news,
+        totalCount: [{ count }],
+      },
+    } = await News.aggregate([
+      {
+        $facet: {
+          news: [{ $skip: skip }, { $limit: limit }],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ]);
     const next =
       count % (skip + limit) === count || (count === 0 && skip === 0)
         ? false
