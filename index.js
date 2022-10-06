@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const userRouter = require("./routes/user");
 const newsRouter = require("./routes/news");
+const categoriesRouter = require("./routes/categories");
 require("dotenv/config");
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/user", userRouter);
 app.use("/news", newsRouter);
+app.use("/categories", categoriesRouter);
 
 app.get("/", (_, res) => {
   res.send("This is home");
