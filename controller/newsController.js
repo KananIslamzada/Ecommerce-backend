@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const { validate, Num } = require("../constants/Validations");
 const News = require("../models/News");
 
 const randomText =
@@ -8,9 +8,10 @@ const generateRandomId = () => Math.random() + Math.random();
 
 const getAllNews = async (req, res) => {
   const page = req.params.page || 0;
-  const numberSchema = Joi.number();
-  const { error } = numberSchema.validate(page);
+
+  const { error } = validate(Num, page);
   if (error) return res.status(400).json(error);
+
   try {
     const limit = 10;
     const skip = parseInt(page) * limit;

@@ -1,17 +1,17 @@
-const Joi = require("joi");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { loginSchema, validateAsync } = require("../constants/Validations");
+require("dotenv/config");
 
 const loginHandle = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ error: "Email is not registered!" });
-  const loginSchema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  });
+
   try {
-    await loginSchema.validateAsync({ email, password });
+    jwt.verify(user.token, process.env.TOKEN_KEY);
+    await validateAsync(loginSchema, { email, password });
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword)
       return res

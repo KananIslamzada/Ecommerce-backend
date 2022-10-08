@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const { validate, categorySchema } = require("../constants/Validations");
 const Categories = require("../models/Categories");
 
 const allCategories = async (_, res) => {
@@ -13,13 +13,9 @@ const allCategories = async (_, res) => {
 const createCategory = async (req, res) => {
   const { name, bgColor, image } = req.body;
 
-  const categorySchema = Joi.object({
-    name: Joi.string().required(),
-    bgColor: Joi.string().max(7).required(),
-    image: Joi.string().uri().required(),
-  });
-  const { error } = categorySchema.validate({ name, bgColor, image });
+  const { error } = validate(categorySchema, { name, bgColor, image });
   if (error) return res.status(400).json(error);
+
   try {
     const newCategory = new Categories({
       name,

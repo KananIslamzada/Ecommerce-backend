@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const { validateAsync, userSchema } = require("../constants/Validations");
+require("dotenv/config");
 
 const handleUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -9,14 +10,12 @@ const handleUser = async (req, res) => {
   if (hasUser)
     return res.status(400).json({ error: "This email is already exists" });
 
-  const userSchema = Joi.object({
-    username: Joi.string().min(6).required(),
-    password: Joi.string().min(6).required(),
-    email: Joi.string().email().required(),
-  });
-
   try {
-    const value = await userSchema.validateAsync({ username, password, email });
+    const value = await validateAsync(userSchema, {
+      username,
+      email,
+      password,
+    });
     const hashPassword = await bcrypt.hash(value.password, 10);
     const token = jwt.sign({ email: value.email }, process.env.TOKEN_KEY, {
       expiresIn: "365 days",
