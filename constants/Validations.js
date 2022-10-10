@@ -22,6 +22,12 @@ const userSchema = Joi.object({
   email: Email.required(),
 });
 
+const resetSchema = Joi.object({
+  currentPassword: Str.min(6).required(),
+  newPassword: Str.min(6).required(),
+  email: Email.required(),
+});
+
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
@@ -37,6 +43,7 @@ module.exports = {
   categorySchema,
   loginSchema,
   userSchema,
+  resetSchema,
   validateAsync,
   validate,
 };
