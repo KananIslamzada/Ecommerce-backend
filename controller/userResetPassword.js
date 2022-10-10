@@ -11,24 +11,12 @@ const jwt = require("jsonwebtoken");
 require("dotenv/config");
 
 const resetHandle = async (req, res) => {
-  const { email, currentPassword, newPassword } = req.body;
+  const { email, password, rePassword } = req.body;
   try {
-    await validateAsync(resetSchema, { email, currentPassword, newPassword });
-    if (currentPassword === newPassword)
-      return res
-        .status(400)
-        .json({ message: "Passwords can not be the same!" });
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found!" });
-    const currentPasswordMatched = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-    if (!currentPasswordMatched)
-      return res
-        .status(400)
-        .json({ message: "Current password is incorrect!" });
-    const hashPassword = await bcrypt.hash(newPassword, 10);
+    await validateAsync(resetSchema, { email, password, rePassword });
+    if (password !== rePassword)
+      return res.status(400).json({ message: "Passwords do not match!" });
+    const hashPassword = await bcrypt.hash(password, 10);
     const token = jwt.sign({ email }, process.env.TOKEN_KEY, {
       expiresIn: "365 days",
     });

@@ -23,8 +23,14 @@ const userSchema = Joi.object({
 });
 
 const resetSchema = Joi.object({
-  currentPassword: Str.min(6).required(),
-  newPassword: Str.min(6).required(),
+  password: Str.min(6).required(),
+  rePassword: Joi.string()
+    .min(6)
+    .valid(Joi.ref("password"))
+    .required()
+    .messages({
+      "any.only": "Passwords do not match!",
+    }),
   email: Email.required(),
 });
 
