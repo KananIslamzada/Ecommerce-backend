@@ -14,8 +14,6 @@ const resetHandle = async (req, res) => {
   const { email, password, rePassword } = req.body;
   try {
     await validateAsync(resetSchema, { email, password, rePassword });
-    if (password !== rePassword)
-      return res.status(400).json({ message: "Passwords do not match!" });
     const hashPassword = await bcrypt.hash(password, 10);
     const token = jwt.sign({ email }, process.env.TOKEN_KEY, {
       expiresIn: "365 days",
