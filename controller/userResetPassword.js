@@ -44,8 +44,7 @@ const resetHandle = async (req, res) => {
 const emailConfirm = async (req, res) => {
   const { email } = req.body;
   try {
-    const { error } = validate(Email.required(), email);
-    if (error) return res.status(400).json(error);
+    await validateAsync(Email.required(), email);
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not registered!" });
 

@@ -7,6 +7,7 @@ const UserRegisterSchema = mongoose.Schema({
   },
   username: {
     type: String,
+    unique: true,
     required: true,
   },
   token: {
