@@ -1,5 +1,4 @@
 const {
-  validate,
   Email,
   validateAsync,
   resetSchema,
