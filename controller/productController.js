@@ -61,7 +61,6 @@ const getProduct = async (req, res) => {
     productObj.reviewsCount = reviewLength;
     res.status(200).json(productObj);
   } catch (error) {
-    console.log(error);
     res.status(400).json(error);
   }
 };
@@ -74,7 +73,7 @@ const createProduct = async (req, res) => {
     if (!store) return res.status(400).json({ message: "Store not found!" });
     const newProduct = new Products(product);
     await newProduct.save();
-    const yes = await Stores.updateOne(
+    await Stores.updateOne(
       {
         _id: newProduct.store,
       },
@@ -84,7 +83,6 @@ const createProduct = async (req, res) => {
         },
       }
     );
-    console.log(yes);
 
     res.status(200).json(newProduct);
   } catch (error) {
