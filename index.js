@@ -5,6 +5,9 @@ const mongoose = require("mongoose");
 const userRouter = require("./routes/user");
 const newsRouter = require("./routes/news");
 const categoriesRouter = require("./routes/categories");
+const reviewsRouter = require("./routes/reviews");
+const productsRouter = require("./routes/products");
+const storesRouter = require("./routes/stores");
 require("dotenv/config");
 
 const app = express();
@@ -14,6 +17,9 @@ app.use(bodyParser.json());
 app.use("/user", userRouter);
 app.use("/news", newsRouter);
 app.use("/categories", categoriesRouter);
+app.use("/reviews", reviewsRouter);
+app.use("/products", productsRouter);
+app.use("/stores", storesRouter);
 
 app.get("/", (_, res) => {
   res.send("This is home");

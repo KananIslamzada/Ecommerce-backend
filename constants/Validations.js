@@ -4,6 +4,8 @@ const Str = Joi.string();
 const Num = Joi.number();
 const Uri = Joi.string().uri();
 const Email = Joi.string().email();
+const Bool = Joi.boolean();
+const IsoDate = Str.isoDate();
 
 const categorySchema = Joi.object({
   name: Str.required(),
@@ -24,32 +26,71 @@ const userSchema = Joi.object({
 
 const resetSchema = Joi.object({
   password: Str.min(6).required(),
-  rePassword: Joi.string()
-    .min(6)
-    .valid(Joi.ref("password"))
-    .required()
-    .messages({
-      "any.only": "Passwords do not match!",
-    }),
+  rePassword: Str.min(6).valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match!",
+  }),
   email: Email.required(),
+});
+
+const reviewSchema = Joi.object({
+  username: Str.required(),
+  starCount: Num.max(5).required(),
+  profileImage: Uri.required(),
+  review: Str.required(),
+  productId: Str.required(),
+});
+
+const productSchema = Joi.object({
+  isSale: Bool.required(),
+  name: Str.required(),
+  description: Str.required(),
+  salePrice: Str.when("isSale", {
+    is: Joi.any().valid(false),
+    then: Joi.optional().allow(null, ""),
+    otherwise: Joi.required(),
+  }),
+  price: Str.required(),
+  stockCount: Num.required(),
+  coverPhoto: Uri.required(),
+  photos: Joi.array()
+    .min(1)
+    .items(
+      Joi.object().keys({
+        image: Uri.required(),
+      })
+    )
+    .required(),
+  store: Str.required(),
+});
+
+const storeSchema = Joi.object({
+  name: Str.min(6).required(),
+  followers: Num,
+  isOfficial: Bool,
+  joined: IsoDate,
+  location: Str.required(),
+  photo: Uri.required(),
 });
 
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
-const validate = (schema, value) => {
-  return schema.validate(value);
-};
+const validate = (schema, value) => schema.validate(value);
 
 module.exports = {
   Str,
   Num,
   Uri,
   Email,
+  Bool,
+  IsoDate,
   categorySchema,
   loginSchema,
   userSchema,
   resetSchema,
+  reviewSchema,
+  productSchema,
+  storeSchema,
   validateAsync,
   validate,
 };

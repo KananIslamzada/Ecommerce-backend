@@ -14,20 +14,9 @@ const getAllNews = async (req, res) => {
 
   try {
     const limit = 10;
-    const skip = parseInt(page) * limit;
-    const {
-      [0]: {
-        news,
-        totalCount: [{ count }],
-      },
-    } = await News.aggregate([
-      {
-        $facet: {
-          news: [{ $skip: skip }, { $limit: limit }],
-          totalCount: [{ $count: "count" }],
-        },
-      },
-    ]);
+    const skip = parseInt(page) * limit || 0;
+    const news = await News.find().skip(skip).limit(limit);
+    const count = await News.count();
     const next =
       count % (skip + limit) === count || (count === 0 && skip === 0)
         ? false
@@ -43,20 +32,20 @@ const getAllNews = async (req, res) => {
 };
 
 const createNews = async (_, res) => {
-  const news = new News({
-    image: `https://picsum.photos/500/500?random=${generateRandomId()}`,
-    title: `Test ${generateRandomId() * 1000}`,
-    content: `${randomText}
-
-    ${randomText}
-
-    ${randomText}
-    
-    ${randomText}
-    
-    ${randomText}`,
-  });
   try {
+    const news = new News({
+      image: `https://picsum.photos/500/500?random=${generateRandomId()}`,
+      title: `Test ${generateRandomId() * 1000}`,
+      content: `${randomText}
+  
+      ${randomText}
+  
+      ${randomText}
+      
+      ${randomText}
+      
+      ${randomText}`,
+    });
     await news.save();
     res.status(201).json(news);
   } catch (error) {
