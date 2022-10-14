@@ -7,6 +7,30 @@ const Products = require("../models/Products");
 const Reviews = require("../models/Reviews");
 const Stores = require("../models/Stores");
 
+const getReviews = async (_, res) => {
+  try {
+    const reviews = await Reviews.find();
+
+    res.status(200).json({ data: reviews });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+const getReview = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await validateAsync(Str.required(), id);
+    const review = await Reviews.findOne({ _id: id });
+    if (!review) return res.status(400).json({ message: "Review not found!" });
+    res.status(200).json(review);
+  } catch (error) {
+    if (error.name === "CastError")
+      return res.status(400).json({ message: "review id is incorrect!" });
+    res.status(400).json(error);
+  }
+};
+
 const createReview = async (req, res) => {
   const review = req.body;
   try {
@@ -90,4 +114,6 @@ const deleteReview = async (req, res) => {
 module.exports = {
   createReview,
   deleteReview,
+  getReview,
+  getReviews,
 };

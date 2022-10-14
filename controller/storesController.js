@@ -8,6 +8,16 @@ const {
 const Reviews = require("../models/Reviews");
 const Products = require("../models/Products");
 
+const getStores = async (_, res) => {
+  try {
+    const stores = await Stores.find();
+    const count = await Stores.count();
+    res.status(200).json({ data: stores, count });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 const getStore = async (req, res) => {
   const { id } = req.params;
   const { error } = validate(Str.required(), id);
@@ -75,4 +85,5 @@ module.exports = {
   getStore,
   createStore,
   deleteStore,
+  getStores,
 };
