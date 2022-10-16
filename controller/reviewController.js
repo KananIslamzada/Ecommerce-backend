@@ -2,10 +2,12 @@ const {
   validateAsync,
   reviewSchema,
   Str,
+  deleteReviewSchema,
 } = require("../constants/Validations");
 const Products = require("../models/Products");
 const Reviews = require("../models/Reviews");
 const Stores = require("../models/Stores");
+const User = require("../models/User");
 
 const getReviews = async (_, res) => {
   try {
@@ -35,6 +37,8 @@ const createReview = async (req, res) => {
   const review = req.body;
   try {
     await validateAsync(reviewSchema, review);
+    const user = await User.findOne({ _id: review.userId });
+    if (!user) return res.status(400).json({ message: "User not found!" });
     const product = await Products.findOne({ _id: review.productId });
     if (!product)
       return res.status(400).json({ message: "Product not found!" });
@@ -66,19 +70,21 @@ const createReview = async (req, res) => {
 
     res.status(200).json(newReview);
   } catch (error) {
-    console.log(error);
+    if (error.name === "CastError")
+      return res.status(400).json({ message: "User not found!" });
     res.status(400).json(error);
   }
 };
 
 const deleteReview = async (req, res) => {
-  const { id } = req.params;
+  const { reviewId, userId } = req.body;
   try {
-    await validateAsync(Str.required(), id);
-    const deletedReview = await Reviews.findOneAndDelete({ _id: id });
+    await validateAsync(deleteReviewSchema, { reviewId, userId });
+    const user = await User.findOne({ _id: userId });
+    if (!user) return res.status(400).json({ message: "User not found!" });
+    const deletedReview = await Reviews.findOneAndDelete({ _id: reviewId });
     if (!deletedReview)
       return res.status(400).json({ message: "Review not found!" });
-
     const product = await Products.findOne({ _id: deletedReview.productId });
     const store = await Stores.findOne({ _id: product.store });
 
@@ -106,7 +112,8 @@ const deleteReview = async (req, res) => {
 
     res.status(200).json({ message: "Review was deleted!" });
   } catch (error) {
-    console.log(error);
+    if (error.name === "CastError")
+      return res.status(400).json({ message: "Review not found!" });
     res.status(400).json(error);
   }
 };

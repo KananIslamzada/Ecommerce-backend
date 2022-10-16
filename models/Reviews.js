@@ -26,6 +26,10 @@ const ReviewSchema = mongoose.Schema({
     type: mongoose.Types.ObjectId,
     required: true,
   },
+  userId: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("reviews", ReviewSchema);

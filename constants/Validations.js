@@ -38,6 +38,12 @@ const reviewSchema = Joi.object({
   profileImage: Uri.required(),
   review: Str.required(),
   productId: Str.required(),
+  userId: Str.required(),
+});
+
+const deleteReviewSchema = Joi.object({
+  reviewId: Str.required(),
+  userId: Str.required(),
 });
 
 const productSchema = Joi.object({
@@ -89,6 +95,7 @@ module.exports = {
   userSchema,
   resetSchema,
   reviewSchema,
+  deleteReviewSchema,
   productSchema,
   storeSchema,
   validateAsync,

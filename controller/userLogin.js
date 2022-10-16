@@ -10,7 +10,9 @@ const loginHandle = async (req, res) => {
   if (!user) return res.status(400).json({ error: "Email is not registered!" });
 
   try {
-    jwt.verify(user.token, process.env.TOKEN_KEY);
+    jwt.verify(user.token, process.env.TOKEN_KEY, (err, token) => {
+      if (err) return res.status(400).json({ message: "Invalid token" });
+    });
     await validateAsync(loginSchema, { email, password });
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword)

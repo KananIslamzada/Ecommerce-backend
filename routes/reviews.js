@@ -5,14 +5,15 @@ const {
   getReview,
   getReviews,
 } = require("../controller/reviewController");
+const auth = require("../middleware/auth");
 const router = express.Router();
 
 router.get("/", getReviews);
 
 router.get("/review/:id?", getReview);
 
-router.post("/create", createReview);
+router.post("/create", auth, createReview);
 
-router.delete("/delete/:id?", deleteReview);
+router.delete("/delete/:id?", auth, deleteReview);
 
 module.exports = router;
