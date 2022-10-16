@@ -7,8 +7,27 @@ const {
 const Products = require("../models/Products");
 const Reviews = require("../models/Reviews");
 const Stores = require("../models/Stores");
+const jwt = require("jsonwebtoken");
+const Wishlist = require("../models/Wishlist");
+require("dotenv/config");
 
 const getProducts = async (req, res) => {
+  let isLogged = false;
+  let userId = null;
+  const token = req.headers.authorization;
+  if (token) {
+    const jwtResponse = jwt.verify(token, process.env.TOKEN_KEY, (err) => {
+      if (err) return { message: "Invalid token!", code: "auth" };
+      const { userId: id } = req.body;
+      const { error } = validate(Str.required(), id);
+      if (error) return { message: "Invalid token!", code: "valid", error };
+      userId = id;
+      isLogged = true;
+    });
+    if (jwtResponse?.code === "auth") return res.status(400).json(jwtResponse);
+    if (jwtResponse?.code === "valid")
+      return res.status(400).json(jwtResponse.error);
+  }
   const { page } = req.params || 0;
   const limit = 10;
   const skip = parseInt(page) * limit || 0;
@@ -23,12 +42,22 @@ const getProducts = async (req, res) => {
       count % (skip + limit) === count || (count === 0 && skip === 0)
         ? false
         : true;
-    res.status(200).json({
+
+    const responseData = {
       data: products,
       count,
       next,
-    });
+    };
+
+    if (isLogged) {
+      const wishlist = await Wishlist.findOne({ id: userId });
+      responseData["wishlist"] = wishlist?.products || [];
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
+    if (error.name === "CastError")
+      return res.status(400).json({ message: "Id is incorrect!" });
     res.status(500).json({ message: error });
   }
 };
@@ -79,7 +108,7 @@ const createProduct = async (req, res) => {
       },
       {
         $push: {
-          products: newProduct.id,
+          products: newProduct._id,
         },
       }
     );

@@ -24,7 +24,7 @@ const mail = async (email, res) => {
         Expires in 5 minutes!!`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error) => {
     if (error)
       return res.status(500).json({ message: "Something went wrong!" });
     const currentTime = new Date();

@@ -6,6 +6,7 @@ const Uri = Joi.string().uri();
 const Email = Joi.string().email();
 const Bool = Joi.boolean();
 const IsoDate = Str.isoDate();
+const Arr = Joi.array();
 
 const categorySchema = Joi.object({
   name: Str.required(),
@@ -78,6 +79,21 @@ const storeSchema = Joi.object({
   photo: Uri.required(),
 });
 
+const wishlistSchema = Joi.object({
+  product: Str.required(),
+  userId: Str.required(),
+});
+
+const sendWishSchema = Joi.object({
+  wishlist: Arr.items(Str),
+  userId: Str.required(),
+});
+
+const deleteWishlistSchema = Joi.object({
+  productId: Str.required(),
+  userId: Str.required(),
+});
+
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
@@ -90,6 +106,7 @@ module.exports = {
   Email,
   Bool,
   IsoDate,
+  Arr,
   categorySchema,
   loginSchema,
   userSchema,
@@ -98,6 +115,9 @@ module.exports = {
   deleteReviewSchema,
   productSchema,
   storeSchema,
+  wishlistSchema,
+  sendWishSchema,
+  deleteWishlistSchema,
   validateAsync,
   validate,
 };
