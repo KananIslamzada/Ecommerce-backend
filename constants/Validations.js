@@ -68,6 +68,7 @@ const productSchema = Joi.object({
     )
     .required(),
   store: Str.required(),
+  category: Str.required(),
 });
 
 const storeSchema = Joi.object({

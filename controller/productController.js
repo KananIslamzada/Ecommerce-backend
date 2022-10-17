@@ -9,6 +9,7 @@ const Reviews = require("../models/Reviews");
 const Stores = require("../models/Stores");
 const jwt = require("jsonwebtoken");
 const Wishlist = require("../models/Wishlist");
+const Categories = require("../models/Categories");
 require("dotenv/config");
 
 const getProducts = async (req, res) => {
@@ -35,7 +36,9 @@ const getProducts = async (req, res) => {
     const products = await Products.find()
       .skip(skip)
       .limit(limit)
-      .select("_id , name , coverPhoto , isSale , salePrice , price , reviews")
+      .select(
+        "_id , name , coverPhoto , isSale , salePrice , price , reviews , category"
+      )
       .populate("reviews", "starCount");
     const count = await Products.count();
     const next =
@@ -100,8 +103,23 @@ const createProduct = async (req, res) => {
     await validateAsync(productSchema, product);
     const store = await Stores.findOne({ _id: product.store });
     if (!store) return res.status(400).json({ message: "Store not found!" });
+    const category = await Categories.findOne({ _id: product.category });
+    if (!category)
+      return res.status(400).json({ message: "Category not found!" });
     const newProduct = new Products(product);
     await newProduct.save();
+
+    await Categories.updateOne(
+      {
+        id: newProduct.categoryId,
+      },
+      {
+        $push: {
+          products: newProduct._id,
+        },
+      }
+    );
+
     await Stores.updateOne(
       {
         _id: newProduct.store,

@@ -40,7 +40,9 @@ const productSchema = mongoose.Schema({
   },
   store: {
     type: mongoose.Types.ObjectId,
-    ref: "stores",
+  },
+  category: {
+    type: mongoose.Types.ObjectId,
   },
   reviews: [
     {
