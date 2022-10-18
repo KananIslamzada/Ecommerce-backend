@@ -7,6 +7,8 @@ const {
   emailConfirm,
   resetHandle,
 } = require("../controller/userResetPassword");
+const auth = require("../middleware/auth");
+const { updateProfile } = require("../controller/userProfileController");
 
 router.post("/register", registerHandle);
 
@@ -17,5 +19,7 @@ router.post("/emailConfirm", emailHandle);
 router.post("/reset/emailConfirm", emailConfirm);
 
 router.patch("/reset", resetHandle);
+
+router.patch("/update", auth, updateProfile);
 
 module.exports = router;

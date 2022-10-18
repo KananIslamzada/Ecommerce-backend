@@ -8,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.get("/:page?", getProducts);
+router.get("/", getProducts);
 
 router.get("/product/:id", getProduct);
 

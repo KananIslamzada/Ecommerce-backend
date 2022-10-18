@@ -29,27 +29,16 @@ const getProducts = async (req, res) => {
     if (jwtResponse?.code === "valid")
       return res.status(400).json(jwtResponse.error);
   }
-  const { page } = req.params || 0;
-  const limit = 10;
-  const skip = parseInt(page) * limit || 0;
   try {
     const products = await Products.find()
-      .skip(skip)
-      .limit(limit)
       .select(
         "_id , name , coverPhoto , isSale , salePrice , price , reviews , category"
       )
       .populate("reviews", "starCount");
-    const count = await Products.count();
-    const next =
-      count % (skip + limit) === count || (count === 0 && skip === 0)
-        ? false
-        : true;
-
+    const count = products.length;
     const responseData = {
       data: products,
       count,
-      next,
     };
 
     if (isLogged) {

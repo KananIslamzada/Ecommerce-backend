@@ -95,6 +95,12 @@ const deleteWishlistSchema = Joi.object({
   userId: Str.required(),
 });
 
+const updateProfileSchema = Joi.object({
+  email: Email,
+  username: Str.min(6),
+  userId: Str.required(),
+});
+
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
@@ -119,6 +125,7 @@ module.exports = {
   wishlistSchema,
   sendWishSchema,
   deleteWishlistSchema,
+  updateProfileSchema,
   validateAsync,
   validate,
 };
