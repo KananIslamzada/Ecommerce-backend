@@ -14,6 +14,6 @@ router.post("/create", auth, createWish);
 
 router.post("/send", sendWishes);
 
-router.delete("/delete/:id?", auth, deleteWish);
+router.delete("/delete", auth, deleteWish);
 
 module.exports = router;
