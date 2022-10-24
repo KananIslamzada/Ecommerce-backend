@@ -63,10 +63,13 @@ const getProduct = async (req, res) => {
       .populate("reviews", "-productId")
       .populate({
         path: "store",
-        select: { __v: 0, name: 1, photo: 1, _id: 1, isOfficial: 1 },
+        select: { __v: 0, name: 1, photo: 1, _id: 1, is },
       });
     if (!product)
       return res.status(400).json({ message: "Product not found!" });
+    const store = await Stores.findOne({ _id: product.store }).select(
+      "name , photo , _id , isOfficial"
+    );
 
     const productObj = product.toObject();
     const reviewLength = productObj.reviews.length;
@@ -78,6 +81,7 @@ const getProduct = async (req, res) => {
 
     productObj.averageStarCount = averageStarCount?.toFixed(1);
     productObj.reviewsCount = reviewLength;
+    productObj.store = store;
     res.status(200).json(productObj);
   } catch (error) {
     res.status(400).json(error);
