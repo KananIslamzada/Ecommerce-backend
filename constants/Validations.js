@@ -111,6 +111,11 @@ const deleteProductFromCardSchema = Joi.object({
   userId: Str.required(),
 });
 
+const sendCardsSchema = Joi.object({
+  products: Arr.items(Str),
+  userId: Str.required(),
+});
+
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
@@ -138,6 +143,7 @@ module.exports = {
   updateProfileSchema,
   addToCardSchema,
   deleteProductFromCardSchema,
+  sendCardsSchema,
   validateAsync,
   validate,
 };

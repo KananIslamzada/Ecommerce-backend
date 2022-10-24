@@ -23,7 +23,6 @@ const getWishes = async (req, res) => {
     const count = wishes?.products?.length || 0;
     res.status(200).json({ data: wishes || [], count });
   } catch (error) {
-    console.log(error);
     res.status(400).json(error);
   }
 };
