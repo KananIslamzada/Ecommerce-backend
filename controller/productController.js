@@ -59,12 +59,10 @@ const getProduct = async (req, res) => {
   const { error } = validate(Str.required(), id);
   if (error) return res.status(400).json(error);
   try {
-    const product = await Products.findOne({ _id: id })
-      .populate("reviews", "-productId")
-      .populate({
-        path: "store",
-        select: { __v: 0, name: 1, photo: 1, _id: 1, is },
-      });
+    const product = await Products.findOne({ _id: id }).populate(
+      "reviews",
+      "-productId"
+    );
     if (!product)
       return res.status(400).json({ message: "Product not found!" });
     const store = await Stores.findOne({ _id: product.store }).select(
