@@ -9,7 +9,8 @@ const reviewsRouter = require("./routes/reviews");
 const productsRouter = require("./routes/products");
 const storesRouter = require("./routes/stores");
 const wishlistsRouter = require("./routes/wishlist");
-const cardsRouter = require('./routes/cards');
+const cardsRouter = require("./routes/cards");
+const checkoutsRouter = require("./routes/checkouts");
 require("dotenv/config");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/products", productsRouter);
 app.use("/stores", storesRouter);
 app.use("/wishlists", wishlistsRouter);
 app.use("/cards", cardsRouter);
+app.use("/checkouts", checkoutsRouter);
 
 app.get("/", (_, res) => {
   res.send("This is home");

@@ -7,6 +7,7 @@ const Email = Joi.string().email();
 const Bool = Joi.boolean();
 const IsoDate = Str.isoDate();
 const Arr = Joi.array();
+const Obj = Joi.object();
 
 const categorySchema = Joi.object({
   name: Str.required(),
@@ -116,6 +117,18 @@ const sendCardsSchema = Joi.object({
   userId: Str.required(),
 });
 
+const sendCheckoutSchema = Joi.object({
+  userId: Str.required(),
+  products: Arr.items(
+    Joi.object({
+      count: Num.min(1).required(),
+      productId: Str.required(),
+    }).required()
+  )
+    .min(1)
+    .required(),
+});
+
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
 
@@ -144,6 +157,7 @@ module.exports = {
   addToCardSchema,
   deleteProductFromCardSchema,
   sendCardsSchema,
+  sendCheckoutSchema,
   validateAsync,
   validate,
 };
