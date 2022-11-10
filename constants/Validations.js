@@ -103,7 +103,10 @@ const updateProfileSchema = Joi.object({
 });
 
 const addToCardSchema = Joi.object({
-  productId: Str.required(),
+  products:Joi.object().keys({
+    product:Str.required(),
+    count:Num.min(1).required()
+  }).required(),
   userId: Str.required(),
 });
 
@@ -113,7 +116,10 @@ const deleteProductFromCardSchema = Joi.object({
 });
 
 const sendCardsSchema = Joi.object({
-  products: Arr.items(Str),
+  products: Arr.items(Joi.object().keys({
+    product:Str.required(),
+    count:Num.min(1).required()
+  })),
   userId: Str.required(),
 });
 

@@ -9,6 +9,22 @@ const Cards = require("../models/Cards");
 const User = require("../models/User");
 const Products = require("../models/Products");
 
+const makeUnique=(arr=[],products)=>{
+  const ids = arr?.map(item=>item?.product?.toString());
+  const prIds = new Set(ids);
+  const newArr = [...arr];
+
+  for(let i=0;i<products.length;i++){
+    const pr = products[i];
+    const prId = pr.product;
+    if(prIds.has(prId))continue;
+    prIds.add(prId);
+    newArr.push(pr);
+  };
+
+  return newArr;
+}
+
 const getCard = async (req, res) => {
   const { id } = req.params;
   try {
@@ -16,10 +32,10 @@ const getCard = async (req, res) => {
     const user = await User.findOne({ _id: id });
     if (!user) return res.status(400).json({ message: "User not found!" });
     const card = await Cards.findOne({ userId: id }).populate({
-      path: "products",
+      path: "products.product",
       select: { __v: 0, description: 0, stockCount: 0, store: 0, photos: 0 },
     });
-    if (!card) return res.status(200).json({ data: [] });
+    if (!card) return res.status(200).json({ products: [] });
     res.status(200).json(card);
   } catch (error) {
     if (error.name === "CastError")
@@ -29,25 +45,25 @@ const getCard = async (req, res) => {
 };
 
 const addToCard = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { userId, products } = req.body;
   try {
-    await validateAsync(addToCardSchema, { userId, productId });
+    await validateAsync(addToCardSchema, { userId, products });
     const user = await User.findOne({ _id: userId });
     if (!user) return res.status(400).json({ message: "User not found!" });
-    const product = await Products.findOne({ _id: productId });
+    const product = await Products.findOne({ _id: products.product });
     if (!product)
       return res.status(400).json({ message: "Product not found!" });
     const card = await Cards.findOne({ userId });
     if (!card) {
       const newCard = new Cards({
         userId: userId,
-        products: [product._id],
+        products: [products],
       });
 
       await newCard.save();
       return res.status(200).json({ message: "Added to card" });
     }
-    const prIds = card.products?.map((item) => item?.toString());
+    const prIds = card.products?.map((item) => item?.product?.toString());
     if (prIds?.includes(product._id.toString()))
       return res.status(400).json({ message: "Product is already in card!" });
 
@@ -55,7 +71,7 @@ const addToCard = async (req, res) => {
       { userId },
       {
         $push: {
-          products: product._id,
+          products: products,
         },
       }
     );
@@ -82,15 +98,13 @@ const sendCards = async (req, res) => {
       return res.status(200).json({ message: "OK" });
     }
 
-    const ids = card.products.map((item) => item?.toString());
-    const clearDup = new Set(ids?.concat(products));
-    const newCardList = [...clearDup].filter((item) => item);
+  const uniques = makeUnique(card.products,products);
 
     await Cards.updateOne(
       { userId },
       {
         $set: {
-          products: newCardList,
+          products: uniques,
         },
       }
     );
@@ -112,18 +126,17 @@ const deleteProductFromCard = async (req, res) => {
       return res.status(400).json({ message: "Product not found!" });
     const card = await Cards.findOne({ userId });
     if (!card) return res.status(400).json({ message: "Card is empty!" });
-    const prIds = card.products?.map((item) => item?.toString());
+    const prIds = card.products?.map((item) => item?.product?.toString());
     if (!prIds.includes(productId))
       return res.status(400).json({ message: "Product is not in card!" });
-    const filteredIds = prIds?.filter(
-      (item) => item !== product._id.toString()
-    );
+  
+      const filtered =  card.products?.filter(item=>item?.product?.toString() !==productId)
 
     await Cards.updateOne(
       { userId },
       {
         $set: {
-          products: filteredIds,
+          products: filtered,
         },
       }
     );
