@@ -7,7 +7,6 @@ const Email = Joi.string().email();
 const Bool = Joi.boolean();
 const IsoDate = Str.isoDate();
 const Arr = Joi.array();
-const Obj = Joi.object();
 
 const categorySchema = Joi.object({
   name: Str.required(),
@@ -103,9 +102,9 @@ const updateProfileSchema = Joi.object({
 });
 
 const addToCardSchema = Joi.object({
-  products:Joi.object().keys({
-    product:Str.required(),
-    count:Num.min(1).required()
+  products: Joi.object().keys({
+    product: Str.required(),
+    count: Num.min(1).required()
   }).required(),
   userId: Str.required(),
 });
@@ -117,8 +116,8 @@ const deleteProductFromCardSchema = Joi.object({
 
 const sendCardsSchema = Joi.object({
   products: Arr.items(Joi.object().keys({
-    product:Str.required(),
-    count:Num.min(1).required()
+    product: Str.required(),
+    count: Num.min(1).required()
   })),
   userId: Str.required(),
 });
@@ -134,6 +133,15 @@ const sendCheckoutSchema = Joi.object({
     .min(1)
     .required(),
 });
+
+const updatePasswordSchema = Joi.object({
+  oldPassword: Str.min(6).required(),
+  password: Str.min(6).required(),
+  passwordAgain: Str.min(6).valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match!",
+  }),
+  userId: Str.required()
+})
 
 const validateAsync = async (schema, value) =>
   await schema.validateAsync(value);
@@ -164,6 +172,7 @@ module.exports = {
   deleteProductFromCardSchema,
   sendCardsSchema,
   sendCheckoutSchema,
+  updatePasswordSchema,
   validateAsync,
   validate,
 };

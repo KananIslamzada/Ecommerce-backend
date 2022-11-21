@@ -1,8 +1,35 @@
 const {
   validateAsync,
   updateProfileSchema,
+  updatePasswordSchema,
 } = require("../constants/Validations");
 const User = require("../models/User");
+const bcrypt = require('bcrypt');
+
+
+const updatePassword = async (req, res) => {
+  const { oldPassword, password, passwordAgain, userId } = req.body;
+  try {
+    await validateAsync(updatePasswordSchema, { oldPassword, password, passwordAgain, userId })
+    const user = await User.findOne({ _id: userId });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const matched = await bcrypt.compare(oldPassword, user.password)
+    if (!matched) return res.status(400).json({ message: "Please enter correct password" });
+    const hashed = await bcrypt.hash(password, 10);
+
+    await User.updateOne({ _id: userId }, {
+      $set: {
+        password: hashed
+      }
+    });
+
+    res.status(200).json({ message: "Password changed" });
+
+  } catch (error) {
+    res.status(400).json(error)
+  }
+}
 
 const checkError = async (user, data) => {
   const { username, email } = data;
@@ -40,4 +67,5 @@ const updateProfile = async (req, res) => {
 
 module.exports = {
   updateProfile,
+  updatePassword
 };
