@@ -8,7 +8,7 @@ const {
   resetHandle,
 } = require("../controller/userResetPassword");
 const auth = require("../middleware/auth");
-const { updateProfile, updatePassword } = require("../controller/userProfileController");
+const { updateProfile, updatePassword, updateImage } = require("../controller/userProfileController");
 
 router.post("/register", registerHandle);
 
@@ -22,6 +22,8 @@ router.patch("/reset", resetHandle);
 
 router.patch("/update", auth, updateProfile);
 
-router.patch("/u", auth, updatePassword)
+router.patch("/updatePassword", auth, updatePassword);
+
+router.patch("/updateImage", auth, updateImage)
 
 module.exports = router;

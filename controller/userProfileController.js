@@ -2,10 +2,14 @@ const {
   validateAsync,
   updateProfileSchema,
   updatePasswordSchema,
+  Str,
 } = require("../constants/Validations");
 const User = require("../models/User");
 const bcrypt = require('bcrypt');
-
+require("dotenv/config");
+const cloudinary = require('cloudinary').v2;
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
 
 const updatePassword = async (req, res) => {
   const { oldPassword, password, passwordAgain, userId } = req.body;
@@ -65,7 +69,39 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const updateImage = async (req, res) => {
+  const { userId } = req.body;
+  const { image } = req.files;
+  try {
+    await validateAsync(Str, userId);
+
+    if (!image) return res.status(400).json({ message: "Image is required" });
+    if (!/^image/.test(image.mimetype)) return res.status(400).json({ message: "Must be valid image type" });
+    const user = await User.findOne({ _id: userId });
+    if (!user) return res.status(400).json({ message: "User not found!" });
+
+    await image.mv(`${appDir}/upload/${image.name}`)
+    await cloudinary.uploader.destroy(`${userId}`, resource_type = "image");
+    const cloudUpload = await cloudinary.uploader.upload(`${appDir}/upload/${image.name}`, {
+      resource_type: "image",
+      public_id: `${userId}`,
+    })
+
+    await User.updateOne({ _id: userId }, {
+      $set: {
+        profilePicture: cloudUpload.secure_url
+      }
+    })
+
+    return res.status(200).json({ message: "Profile picture updated!" })
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+
+}
+
 module.exports = {
   updateProfile,
-  updatePassword
+  updatePassword,
+  updateImage
 };

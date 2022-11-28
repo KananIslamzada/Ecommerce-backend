@@ -13,7 +13,7 @@ const loginHandle = async (req, res) => {
     const jwsResponse = jwt.verify(
       user.token,
       process.env.TOKEN_KEY,
-      (err, token) => {
+      (err, _) => {
         if (err) return { message: "Invalid token", error: true };
       }
     );

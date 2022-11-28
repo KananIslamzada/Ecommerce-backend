@@ -2,6 +2,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
+const fileUpload = require('express-fileupload');
 const userRouter = require("./routes/user");
 const newsRouter = require("./routes/news");
 const categoriesRouter = require("./routes/categories");
@@ -17,6 +18,12 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(fileUpload({
+  abortOnLimit: true,
+  limits: {
+    fileSize: 5000000
+  },
+}))
 app.use("/user", userRouter);
 app.use("/news", newsRouter);
 app.use("/categories", categoriesRouter);
